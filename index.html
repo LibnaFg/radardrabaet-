@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Radar Interno — Dr. Abaeté Neto</title>
+<style>
+:root{
+  --bg:#f4f5f2; --panel:#ffffff; --text:#17211b; --muted:#647067;
+  --line:#dce3dd; --green:#0d3b2e; --green2:#1f5b49; --soft:#eaf2ed;
+  --hot:#9b2c2c; --hotbg:#fff0f0; --week:#8a5b08; --weekbg:#fff7e6;
+  --ever:#2e5f8a; --everbg:#eef6fd; --shadow:0 10px 30px rgba(18,32,24,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:1280px;margin:auto;padding:28px}
+header{background:linear-gradient(135deg,#0c3025,#174e3d);color:#fff;border-radius:24px;padding:34px 36px;box-shadow:var(--shadow)}
+.kicker{font-size:12px;letter-spacing:.15em;text-transform:uppercase;opacity:.75}
+h1{font-size:38px;line-height:1.08;margin:10px 0 8px}
+.subtitle{max-width:930px;opacity:.92;line-height:1.55}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.10);font-size:13px}
+.grid{display:grid;gap:18px}
+.metrics{grid-template-columns:repeat(5,1fr);margin:20px 0}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+.metric b{display:block;font-size:28px;color:var(--green)}
+.metric span{font-size:12px;color:var(--muted)}
+section{margin-top:28px}
+.section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}
+h2{font-size:23px;margin:0}
+.note{font-size:13px;color:var(--muted)}
+.lines{grid-template-columns:repeat(5,1fr)}
+.line-card{background:white;border:1px solid var(--line);border-radius:18px;padding:17px}
+.line-card .n{font-size:11px;font-weight:800;color:var(--green2);letter-spacing:.08em}
+.line-card h3{font-size:15px;line-height:1.3;color:var(--green);margin:8px 0}
+.line-card p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+.toolbar{background:white;border:1px solid var(--line);border-radius:18px;padding:14px}
+.toolbar-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar-row+.toolbar-row{margin-top:10px}
+.toolbar-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+button.filter{border:1px solid var(--line);background:white;padding:9px 11px;border-radius:999px;cursor:pointer;font-weight:650;font-size:12px}
+button.filter.active{background:var(--green);color:white;border-color:var(--green)}
+.radar{grid-template-columns:repeat(2,1fr);margin-top:14px}
+.card{background:white;border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 20px rgba(18,32,24,.04)}
+.card.hide{display:none}
+.cardtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.badge{font-size:11px;font-weight:800;border-radius:999px;padding:7px 9px}
+.hot{background:var(--hotbg);color:var(--hot)}
+.week{background:var(--weekbg);color:var(--week)}
+.ever{background:var(--everbg);color:var(--ever)}
+.score{font-size:12px;color:var(--muted);font-weight:700}
+.card h3{font-size:19px;line-height:1.25;margin:0}
+.card p{font-size:14px;line-height:1.55;margin:0;color:#425048}
+.label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;margin-bottom:4px}
+.editorial{background:#f7f9f7;border-left:3px solid var(--green2);padding:10px 12px;border-radius:10px;font-size:12px}
+.block{border-top:1px solid var(--line);padding-top:10px}
+.angle{background:var(--soft);padding:12px;border-radius:14px}
+.angle strong{color:var(--green)}
+.tags{display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-size:11px;border:1px solid var(--line);padding:6px 8px;border-radius:999px}
+.source{font-size:13px;font-weight:700;color:var(--green2);text-decoration:none}
+.top5{background:#0d2f25;color:white;border-radius:22px;padding:24px}
+.top5 li{padding:7px 0;line-height:1.45}
+.calendar,.workflow{overflow-x:auto;background:white;border:1px solid var(--line);border-radius:18px}
+table{border-collapse:collapse;width:100%;min-width:1020px}
+th,td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;vertical-align:top}
+th{background:#f7f9f7;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#4e5a53}
+tr:last-child td{border-bottom:0}
+.status{font-weight:700}
+.todo{color:#8a5b08}.ready{color:#1f5b49}.hold{color:#2e5f8a}
+.logic{grid-template-columns:repeat(4,1fr)}
+footer{margin:30px 0 10px;color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:1100px){.metrics{grid-template-columns:repeat(3,1fr)}.lines{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.radar{grid-template-columns:1fr}.logic{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.wrap{padding:14px}header{padding:24px 20px}.metrics,.lines,.logic{grid-template-columns:1fr}h1{font-size:30px}.section-head{display:block}.note{margin-top:5px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">Uso interno · equipe de conteúdo</div>
+  <h1>Radar Editorial — Dr. Abaeté Neto</h1>
+  <div class="subtitle">
+    Sistema semanal de inteligência editorial para identificar pautas quentes, cruzar oportunidades com as cinco linhas editoriais e transformar acontecimentos recentes em conteúdos acionáveis.
+  </div>
+  <div class="meta">
+    <span class="pill">Atualização automática: semanal</span>
+    <span class="pill">Execução: segunda-feira pela manhã</span>
+    <span class="pill">Uso: estratégia + pauta + produção</span>
+  </div>
+</header>
+
+<div class="grid metrics">
+  <div class="metric"><b>7</b><span>pautas selecionadas</span></div>
+  <div class="metric"><b>4</b><span>publicar agora</span></div>
+  <div class="metric"><b>2</b><span>nesta semana</span></div>
+  <div class="metric"><b>1</b><span>estratégica</span></div>
+  <div class="metric"><b>5</b><span>linhas editoriais ativas</span></div>
+</div>
+
+<section>
+  <div class="section-head">
+    <h2>Linhas editoriais oficiais</h2>
+    <div class="note">Filtro obrigatório para entrada de pauta no radar.</div>
+  </div>
+  <div class="grid lines">
+    <div class="line-card"><div class="n">01</div><h3>Corrida, Lesões e Longevidade Esportiva</h3><p>Lesões de corrida, prevenção, retorno ao esporte, dores do treino e manutenção da prática esportiva ao longo dos anos.</p></div>
+    <div class="line-card"><div class="n">02</div><h3>Alternativas à Cirurgia e Longevidade Ativa</h3><p>Artrose, joelho, coluna, dores crônicas e possibilidades de tratamento não cirúrgico quando clinicamente indicadas.</p></div>
+    <div class="line-card"><div class="n">03</div><h3>Tecnologia a Serviço da Precisão</h3><p>Ultrassom musculoesquelético, procedimentos guiados, diagnóstico por imagem e recursos tecnológicos.</p></div>
+    <div class="line-card"><div class="n">04</div><h3>O Raciocínio por Trás do Diagnóstico</h3><p>Interpretação de exames, indicação, ciência, mitos, segunda opinião e critérios clínicos.</p></div>
+    <div class="line-card"><div class="n">05</div><h3>Recuperar Função. Retomar Movimento.</h3><p>Funcionalidade, autonomia, qualidade de vida e objetivos do paciente, sem promessa de resultado.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Radar da semana</h2>
+    <div class="note">Filtro por urgência e linha editorial.</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-row">
+      <span class="toolbar-label">Urgência</span>
+      <button class="filter urgency active" data-filter="all">Todas</button>
+      <button class="filter urgency" data-filter="hot">Publicar agora</button>
+      <button class="filter urgency" data-filter="week">Nesta semana</button>
+      <button class="filter urgency" data-filter="ever">Estratégica</button>
+    </div>
+    <div class="toolbar-row">
+      <span class="toolbar-label">Linha</span>
+      <button class="filter line active" data-line="all">Todas</button>
+      <button class="filter line" data-line="corrida">01 Corrida</button>
+      <button class="filter line" data-line="cirurgia">02 Alternativas</button>
+      <button class="filter line" data-line="tecnologia">03 Tecnologia</button>
+      <button class="filter line" data-line="raciocinio">04 Raciocínio</button>
+      <button class="filter line" data-line="funcao">05 Função</button>
+    </div>
+  </div>
+
+  <div class="grid radar">
+
+    <article class="card" data-kind="hot" data-lines="corrida raciocinio funcao">
+      <div class="cardtop"><span class="badge hot">PUBLICAR AGORA</span><span class="score">9,7/10</span></div>
+      <h3>Retorno ao esporte após lesão: voltar rápido não é o mesmo que voltar bem</h3>
+      <div class="editorial"><b>Linhas:</b> 01 Corrida · 04 Raciocínio · 05 Função</div>
+      <div><div class="label">Fato</div><p>Revisão recente analisa estratégias de reabilitação após lesões agudas de isquiotibiais, incluindo tempo de retorno ao esporte e risco de nova lesão.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>Alta identificação com corredores e esportistas lesionados e forte conexão com decisão clínica.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Explicar que retorno ao esporte deve considerar função, confiança, carga e risco de recidiva — não apenas calendário.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“Voltar rápido ou voltar bem?”</strong></div>
+      <div><div class="label">CTA</div><p>“Se você está voltando de uma lesão, o critério não deveria ser apenas tempo.”</p></div>
+      <div class="tags"><span class="tag">Reels</span><span class="tag">Status: pautar</span><span class="tag">Alta prioridade</span></div>
+      <a class="source" href="https://www.nature.com/articles/s41598-026-70693-1" target="_blank">Fonte científica ↗</a>
+    </article>
+
+    <article class="card" data-kind="hot" data-lines="tecnologia raciocinio">
+      <div class="cardtop"><span class="badge hot">PUBLICAR AGORA</span><span class="score">9,5/10</span></div>
+      <h3>PRP, ultrassom e procedimentos guiados: tecnologia sem indicação não é precisão</h3>
+      <div class="editorial"><b>Linhas:</b> 03 Tecnologia · 04 Raciocínio</div>
+      <div><div class="label">Fato</div><p>BRASIT 2026 reúne discussões sobre PRP/PRF, infiltrações guiadas por ultrassom, ortobiologia, dor e sarcopenia.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>Ótimo gancho para diferenciar inovação real de uso indiscriminado de tecnologia.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Mostrar que recurso tecnológico melhora a precisão, mas não substitui história clínica, exame físico e indicação correta.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“Tecnologia não substitui indicação.”</strong></div>
+      <div><div class="label">CTA</div><p>“O melhor recurso é aquele que faz sentido para o seu caso.”</p></div>
+      <div class="tags"><span class="tag">Carrossel</span><span class="tag">Status: pautar</span><span class="tag">Alta prioridade</span></div>
+      <a class="source" href="https://abeti.org.br/eventos-2026/brasit-2026/informacoes-gerais" target="_blank">Programação oficial ↗</a>
+    </article>
+
+    <article class="card" data-kind="hot" data-lines="cirurgia raciocinio">
+      <div class="cardtop"><span class="badge hot">PUBLICAR AGORA</span><span class="score">9,4/10</span></div>
+      <h3>PRP ou ácido hialurônico na artrose grave? A técnica não deveria ser a primeira pergunta</h3>
+      <div class="editorial"><b>Linhas:</b> 02 Alternativas · 04 Raciocínio</div>
+      <div><div class="label">Fato</div><p>Ensaio brasileiro compara PRP e ácido hialurônico na osteoartrite grave do joelho.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>Permite explicar critério de indicação e combater comparação simplista entre tratamentos.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Falar sobre estágio da doença, expectativa, função, evidência e contexto do paciente.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“Qual tratamento é melhor? A pergunta está incompleta.”</strong></div>
+      <div><div class="label">CTA</div><p>“Tratamento não é ranking: é indicação.”</p></div>
+      <div class="tags"><span class="tag">Reels</span><span class="tag">Status: pautar</span><span class="tag">Alta prioridade</span></div>
+      <a class="source" href="https://ensaiosclinicos.gov.br/rg/RBR-10txpdvc" target="_blank">Registro do ensaio ↗</a>
+    </article>
+
+    <article class="card" data-kind="hot" data-lines="raciocinio cirurgia">
+      <div class="cardtop"><span class="badge hot">PUBLICAR AGORA</span><span class="score">9,1/10</span></div>
+      <h3>Diferença estatística não significa automaticamente benefício relevante para o paciente</h3>
+      <div class="editorial"><b>Linhas:</b> 04 Raciocínio · 02 Alternativas</div>
+      <div><div class="label">Fato</div><p>Meta-análise recente sobre ortobiológicos e viscossuplementação discute diferenças estatísticas e magnitude clínica.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>Excelente pauta de autoridade e leitura crítica de evidência.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Traduzir o conceito de significância clínica de forma simples e conectada à experiência do paciente.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“O artigo mostrou diferença. Mas o paciente sente?”</strong></div>
+      <div><div class="label">CTA</div><p>“Ciência boa não termina no número; precisa chegar à vida real.”</p></div>
+      <div class="tags"><span class="tag">Carrossel</span><span class="tag">Status: pautar</span><span class="tag">Alta prioridade</span></div>
+      <a class="source" href="https://pubmed.ncbi.nlm.nih.gov/42524752/" target="_blank">PubMed ↗</a>
+    </article>
+
+    <article class="card" data-kind="week" data-lines="corrida funcao">
+      <div class="cardtop"><span class="badge week">NESTA SEMANA</span><span class="score">8,8/10</span></div>
+      <h3>Maratona de Chicago: longevidade esportiva também é saber quando recuar</h3>
+      <div class="editorial"><b>Linhas:</b> 01 Corrida · 05 Função</div>
+      <div><div class="label">Fato</div><p>A Maratona de Chicago acontece em 11 de outubro de 2026.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>Janela perfeita para dor pré-prova, ansiedade, sobrecarga e decisões que afetam continuidade no esporte.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Usar a experiência do Dr. Abaeté como maratonista e médico do esporte para falar de longevidade esportiva.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“Longevidade esportiva é conseguir continuar correndo depois da prova.”</strong></div>
+      <div><div class="label">CTA</div><p>“Seu objetivo é completar uma prova ou continuar correndo por anos?”</p></div>
+      <div class="tags"><span class="tag">Reels + Stories</span><span class="tag">Status: pautar</span><span class="tag">Timing semanal</span></div>
+      <a class="source" href="https://www.chicagomarathon.com/about/future-event-dates/" target="_blank">Data oficial ↗</a>
+    </article>
+
+    <article class="card" data-kind="week" data-lines="cirurgia funcao raciocinio">
+      <div class="cardtop"><span class="badge week">NESTA SEMANA</span><span class="score">8,5/10</span></div>
+      <h3>Artrose: exercício e educação não são “plano B”</h3>
+      <div class="editorial"><b>Linhas:</b> 02 Alternativas · 04 Raciocínio · 05 Função</div>
+      <div><div class="label">Fato</div><p>Pesquisa recente sobre artrose de quadril e joelho avalia intervenção com exercício e educação.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>Ajuda a reforçar abordagem multimodal e combate a ideia de que tratamento sério precisa ser invasivo.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Explicar que procedimento, exercício, controle de carga e acompanhamento podem compor uma mesma estratégia.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“Em artrose, tratar não é apenas agir sobre a articulação.”</strong></div>
+      <div><div class="label">CTA</div><p>“O objetivo é preservar função e autonomia pelo maior tempo possível.”</p></div>
+      <div class="tags"><span class="tag">Carrossel</span><span class="tag">Status: pautar</span><span class="tag">Média prioridade</span></div>
+      <a class="source" href="https://pubmed.ncbi.nlm.nih.gov/42373005/" target="_blank">PubMed ↗</a>
+    </article>
+
+    <article class="card" data-kind="ever" data-lines="funcao cirurgia">
+      <div class="cardtop"><span class="badge ever">ESTRATÉGICA</span><span class="score">8,2/10</span></div>
+      <h3>No paciente sênior, preservar movimento é preservar autonomia</h3>
+      <div class="editorial"><b>Linhas:</b> 05 Função · 02 Alternativas</div>
+      <div><div class="label">Fato</div><p>Pesquisas recentes seguem reforçando a relação entre mobilidade, independência e participação social no envelhecimento.</p></div>
+      <div class="block"><div class="label">Relevância para conteúdo</div><p>É uma pauta evergreen forte para transformar benefício clínico em valor percebido pelo paciente.</p></div>
+      <div class="block"><div class="label">Como trabalhar</div><p>Falar de caminhar, viajar, subir escadas, brincar com netos e manter a própria rotina.</p></div>
+      <div class="angle"><div class="label">Head / Hook</div><strong>“Às vezes, o maior resultado do tratamento é continuar decidindo a própria vida.”</strong></div>
+      <div><div class="label">CTA</div><p>“Função também é qualidade de vida.”</p></div>
+      <div class="tags"><span class="tag">Vídeo</span><span class="tag">Status: banco</span><span class="tag">Evergreen</span></div>
+      <a class="source" href="https://www.frontiersin.org/journals/digital-health/articles/10.3389/fdgth.2026.1783585/full" target="_blank">Referência ↗</a>
+    </article>
+
+  </div>
+</section>
+
+<section class="top5">
+  <div class="kicker">Decisão da semana</div>
+  <h2>Top 5 prioritário</h2>
+  <ol>
+    <li><b>Retorno ao esporte após lesão</b> — melhor combinação entre timing, aderência e identificação.</li>
+    <li><b>BRASIT 2026 / tecnologia com precisão</b> — excelente para Linha 03 e autoridade.</li>
+    <li><b>PRP × ácido hialurônico</b> — forte para educação e critério de indicação.</li>
+    <li><b>Significância estatística × clínica</b> — conteúdo de autoridade médica.</li>
+    <li><b>Maratona de Chicago</b> — oportunidade de corrida, humanização e longevidade esportiva.</li>
+  </ol>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Calendário sugerido</h2>
+    <div class="note">Base para reunião de pauta interna.</div>
+  </div>
+  <div class="calendar">
+    <table>
+      <thead><tr><th>Dia</th><th>Pauta</th><th>Linha</th><th>Formato</th><th>Prioridade</th><th>Status</th><th>Responsável</th></tr></thead>
+      <tbody>
+        <tr><td>Seg</td><td>Retorno ao esporte após lesão</td><td>01 + 04 + 05</td><td>Reels</td><td>Alta</td><td class="status todo">Pautar</td><td>—</td></tr>
+        <tr><td>Ter</td><td>BRASIT / precisão e tecnologia</td><td>03 + 04</td><td>Carrossel</td><td>Alta</td><td class="status todo">Pautar</td><td>—</td></tr>
+        <tr><td>Qua</td><td>PRP × ácido hialurônico</td><td>02 + 04</td><td>Reels</td><td>Alta</td><td class="status todo">Pautar</td><td>—</td></tr>
+        <tr><td>Qui</td><td>Significância clínica</td><td>04</td><td>Carrossel</td><td>Alta</td><td class="status todo">Pautar</td><td>—</td></tr>
+        <tr><td>Sex/Sáb</td><td>Maratona de Chicago</td><td>01 + 05</td><td>Reels + Stories</td><td>Média/Alta</td><td class="status todo">Pautar</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Fluxo interno</h2>
+    <div class="note">Da descoberta à publicação.</div>
+  </div>
+  <div class="workflow">
+    <table>
+      <thead><tr><th>Etapa</th><th>Critério</th><th>Saída esperada</th></tr></thead>
+      <tbody>
+        <tr><td>1. Descoberta</td><td>Últimos 7 dias + próximos acontecimentos relevantes</td><td>Lista bruta de oportunidades</td></tr>
+        <tr><td>2. Filtro editorial</td><td>Aderência a pelo menos uma das 5 linhas</td><td>Pautas válidas</td></tr>
+        <tr><td>3. Score</td><td>Atualidade + aderência + autoridade + utilidade</td><td>Nota de 0 a 10</td></tr>
+        <tr><td>4. Priorização</td><td>Urgência e janela de oportunidade</td><td>Agora / Semana / Estratégica</td></tr>
+        <tr><td>5. Direção criativa</td><td>Ângulo, hook, formato e CTA</td><td>Pauta pronta para produção</td></tr>
+        <tr><td>6. Produção</td><td>Roteiro, design, gravação, revisão</td><td>Conteúdo final</td></tr>
+        <tr><td>7. Arquivo</td><td>Marcar pauta usada ou descartada</td><td>Evitar repetição futura</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Regra do sistema</h2>
+    <div class="note">O radar não é um agregador de notícias.</div>
+  </div>
+  <div class="grid logic">
+    <div class="line-card"><h3>Aderência</h3><p>A pauta precisa caber de forma natural em uma das cinco linhas editoriais.</p></div>
+    <div class="line-card"><h3>Atualidade</h3><p>Precisa haver um motivo claro para falar sobre o tema agora.</p></div>
+    <div class="line-card"><h3>Autoridade</h3><p>O Dr. Abaeté precisa conseguir acrescentar raciocínio, contexto ou interpretação.</p></div>
+    <div class="line-card"><h3>Utilidade</h3><p>O conteúdo precisa ajudar o público a entender melhor decisão, função, tratamento ou movimento.</p></div>
+  </div>
+</section>
+
+<footer>
+  <b>Uso interno:</b> toda pauta médica deve passar por validação técnica antes da publicação. Evitar promessas de resultado, generalizações terapêuticas, sensacionalismo e comunicação que sugira que cirurgia pode ser evitada em todos os casos.
+</footer>
+</div>
+
+<script>
+let urgency="all", line="all";
+const cards=[...document.querySelectorAll(".card")];
+function apply(){
+  cards.forEach(c=>{
+    const u=urgency==="all"||c.dataset.kind===urgency;
+    const l=line==="all"||(c.dataset.lines||"").split(" ").includes(line);
+    c.classList.toggle("hide",!(u&&l));
+  });
+}
+document.querySelectorAll(".filter.urgency").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".filter.urgency").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); urgency=b.dataset.filter; apply();
+});
+document.querySelectorAll(".filter.line").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".filter.line").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); line=b.dataset.line; apply();
+});
+</script>
+</body>
+</html>
